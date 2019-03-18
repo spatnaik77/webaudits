@@ -1,0 +1,89 @@
+{
+	"info": {
+		"_postman_id": "49dfc380-3227-4a8b-bf39-76e6562fac63",
+		"name": "webaudits",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:8080/api/notes",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n        \"title\": \"personal\",\n        \"content\": \"Study with serene\"\n \n}"
+				},
+				"url": {
+					"raw": "localhost:8080/api/notes",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"notes"
+					]
+				},
+				"description": "Create Note"
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/api/notes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/api/notes",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"notes"
+					]
+				},
+				"description": "Get All Notes"
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/api/notes/1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/api/notes/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"notes",
+						"1"
+					]
+				},
+				"description": "Get note by id"
+			},
+			"response": []
+		}
+	]
+}

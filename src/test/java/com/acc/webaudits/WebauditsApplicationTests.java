@@ -1,0 +1,47 @@
+package com.acc.webaudits;
+
+import com.acc.webaudits.model.Crawler;
+import com.acc.webaudits.model.Note;
+import com.acc.webaudits.model.Scanner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class WebauditsApplicationTests {
+
+	@Autowired
+	ApiManager apiManager;
+
+	@Test
+	public void contextLoads() {
+
+		System.out.println("contextLoads");
+		apiManager.cleanDB();
+	}
+
+	@Test
+	public void someScenario()
+	{
+		//Create the crawler
+		String crawlerName = "bmw-india";
+		Crawler  c = new Crawler();
+		c.setName(crawlerName);
+		c.setUrl("www.yahoo.com");
+		apiManager.createCrawler(c);
+
+		//Now create the scanner
+		Scanner s = new Scanner();
+		s.setName("scan-1");
+		s.setDtmUrl("some-dtm-url");
+		s.setCrawlerName(crawlerName);
+		apiManager.createScanner(s);
+
+	}
+
+
+
+}
