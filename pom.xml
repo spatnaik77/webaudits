@@ -27,9 +27,9 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<dependency>
+	<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-firefox-driver</artifactId>
+			<artifactId>selenium-java</artifactId>
 			<version>3.1.0</version>
 		</dependency>
 		<dependency>
