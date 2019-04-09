@@ -30,15 +30,15 @@ public class WebauditsApplicationTests {
 		String crawlerName = "bmw-india";
 		Crawler  c = new Crawler();
 		c.setName(crawlerName);
-		c.setUrl("www.yahoo.com");
+		c.setUrl("https://www.bmw.de/de/footer/sitemap.html");
 		apiManager.createCrawler(c);
 
 		//Now create the scanner
-		Scanner s = new Scanner();
+		/*Scanner s = new Scanner();
 		s.setName("scan-1");
 		s.setDtmUrl("some-dtm-url");
 		s.setCrawlerName(crawlerName);
-		apiManager.createScanner(s);
+		apiManager.createScanner(s);*/
 
 	}
 

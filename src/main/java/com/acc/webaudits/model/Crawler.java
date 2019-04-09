@@ -16,6 +16,8 @@ public class Crawler {
     @NotBlank
     private String status;
 
+    private int crawledURLCount;
+
 
     public String getName() {
         return name;
@@ -39,5 +41,13 @@ public class Crawler {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public int getCrawledURLCount() {
+        return crawledURLCount;
+    }
+
+    public void setCrawledURLCount(int crawledURLCount) {
+        this.crawledURLCount = crawledURLCount;
     }
 }

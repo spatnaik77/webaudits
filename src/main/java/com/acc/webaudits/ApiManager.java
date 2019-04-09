@@ -4,16 +4,19 @@ import com.acc.webaudits.model.Crawler;
 import com.acc.webaudits.model.CrawlerDetail;
 import com.acc.webaudits.model.Scanner;
 import com.acc.webaudits.model.ScannerDetail;
-import com.acc.webaudits.repository.CrawlerDetailRepository;
-import com.acc.webaudits.repository.CrawlerRepository;
-import com.acc.webaudits.repository.ScannerDetailRepository;
-import com.acc.webaudits.repository.ScannerRepository;
+import com.acc.webaudits.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Repository
 public class ApiManager {
@@ -29,6 +32,11 @@ public class ApiManager {
 
     @Autowired
     ScannerDetailRepository scannerDetailRepository;
+
+    @Autowired
+    WebDriverManager webDriverManager;
+
+    private final String URL_XPATH = "//a[contains(@class,'ds2-icon--arrow-big-r-grey-2')]";
 
     public void cleanDB()
     {
@@ -48,20 +56,22 @@ public class ApiManager {
 
         String url = crawler.getUrl();
         //Crawl and get the list of urls
-
-        List<String> urls = Arrays.asList("yahoo.com/a", "yahoo.com/b", "yahoo.com/c");
-        for(String u : urls)
+        WebDriver webDriver = webDriverManager.getWebDriver();
+        //driver.get(url);
+        List<WebElement> webElements = webDriver.findElements(By.xpath(URL_XPATH));
+        System.out.println("total links" + webElements.size());
+        for(WebElement webElement : webElements)
         {
             CrawlerDetail crawlerDetail = new CrawlerDetail();
             crawlerDetail.setCrawlerName(crawler.getName());
-            crawlerDetail.setCrawled_url(u);
+            crawlerDetail.setCrawled_url(webElement.getAttribute("href"));
             crawlerDetailRepository.save(crawlerDetail);
         }
         //set the crawler status to complete
         Crawler c = crawlerRepository.findById(crawler.getName()).get();
+        c.setCrawledURLCount(webElements.size());
         c.setStatus("complete");
         crawlerRepository.save(c);
-
     }
 
     public void createScanner(Scanner scanner)
@@ -100,7 +110,6 @@ public class ApiManager {
         s.setStatus("complete");
         scannerRepository.save(s);
     }
-
 
 
 }
