@@ -57,7 +57,7 @@ public class ApiManager {
         String url = crawler.getUrl();
         //Crawl and get the list of urls
         WebDriver webDriver = webDriverManager.getWebDriver();
-        //driver.get(url);
+        webDriver.get(url);
         List<WebElement> webElements = webDriver.findElements(By.xpath(URL_XPATH));
         System.out.println("total links" + webElements.size());
         for(WebElement webElement : webElements)
