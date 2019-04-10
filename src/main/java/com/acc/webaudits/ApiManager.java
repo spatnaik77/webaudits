@@ -1,9 +1,6 @@
 package com.acc.webaudits;
 
-import com.acc.webaudits.model.Crawler;
-import com.acc.webaudits.model.CrawlerDetail;
-import com.acc.webaudits.model.Scanner;
-import com.acc.webaudits.model.ScannerDetail;
+import com.acc.webaudits.model.*;
 import com.acc.webaudits.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -73,7 +70,27 @@ public class ApiManager {
         c.setStatus("complete");
         crawlerRepository.save(c);
     }
+    public List<Crawler> getAllCrawlers()
+    {
+        return crawlerRepository.findAll();
+    }
+    public CrawlerInfo getCrawlerInfo(String crawlerName)
+    {
+        Crawler crawler = crawlerRepository.getOne(crawlerName);
+        List<CrawlerDetail> crawlerDetailList = crawlerDetailRepository.findByCrawlerName(crawlerName);
 
+        CrawlerInfo crawlerInfo = new CrawlerInfo();
+        crawlerInfo.setName(crawler.getName());
+        crawlerInfo.setStatus(crawler.getStatus());
+        crawlerInfo.setUrl(crawler.getUrl());
+        crawlerInfo.setCrawledURLCount(crawler.getCrawledURLCount());
+        for(CrawlerDetail crawlerDetail : crawlerDetailList)
+        {
+            crawlerInfo.addCrawleredURL(crawlerDetail.getCrawled_url());
+        }
+        return crawlerInfo;
+
+    }
     public void createScanner(Scanner scanner)
     {
         scanner.setStatus("in-progress");
