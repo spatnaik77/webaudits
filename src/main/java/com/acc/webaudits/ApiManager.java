@@ -12,6 +12,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
@@ -45,7 +46,7 @@ public class ApiManager {
 
         crawlerRepository.deleteAll();
     }
-
+    @Transactional
     public void createCrawler(Crawler crawler)
     {
         crawler.setStatus("in-progress");
@@ -70,10 +71,13 @@ public class ApiManager {
         c.setStatus("complete");
         crawlerRepository.save(c);
     }
+    @Transactional
     public List<Crawler> getAllCrawlers()
     {
         return crawlerRepository.findAll();
     }
+
+    @Transactional
     public CrawlerInfo getCrawlerInfo(String crawlerName)
     {
         Crawler crawler = crawlerRepository.getOne(crawlerName);
@@ -91,6 +95,7 @@ public class ApiManager {
         return crawlerInfo;
 
     }
+    @Transactional
     public void createScanner(Scanner scanner)
     {
         scanner.setStatus("in-progress");
