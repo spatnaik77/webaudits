@@ -14,7 +14,6 @@ public class CrawlerDetail {
     @NotBlank
     private String crawlerName;
 
-    @NotBlank
     private String crawled_url;
 
 

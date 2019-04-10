@@ -16,6 +16,7 @@ public class Crawler {
     @NotBlank
     private String status;
 
+
     private int crawledURLCount;
 
 
