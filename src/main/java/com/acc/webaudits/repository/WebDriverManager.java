@@ -22,11 +22,13 @@ public class WebDriverManager
             options.addArguments("disable-infobars");
             options.addArguments("--headless");
             capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-            webDriver = new ChromeDriver(capabilities);
+            webDriver = new ChromeDriver(options);
+
             System.out.println(webDriver);
         }
         catch (Exception e)
         {
+            System.out.println(e.getMessage());
             e.printStackTrace();
         }
     }
