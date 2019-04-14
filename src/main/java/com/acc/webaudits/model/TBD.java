@@ -1,19 +1,16 @@
-package com.acc.webaudits.repository;
+package com.acc.webaudits.model;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public class WebDriverManager
-{
-    public static WebDriver createWebDriver()
+public class TBD {
+    public static void main(String[] args)
     {
-        WebDriver webDriver = null;
-        try
+        for(int c = 0; c < 3; c++)
         {
+            long statrtTime = System.currentTimeMillis();
             DesiredCapabilities capabilities = new DesiredCapabilities();
             ChromeOptions options = new ChromeOptions();
             options.addArguments("-incognito");
@@ -21,12 +18,12 @@ public class WebDriverManager
             options.addArguments("disable-infobars");
             options.addArguments("--headless");
             capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-            webDriver = new ChromeDriver(options);
+            WebDriver webDriver = new ChromeDriver(options);
+            webDriver.close();
+            webDriver.quit();
+            long endTime = System.currentTimeMillis();
+            System.out.println(webDriver + "\t " + (endTime-statrtTime) + " Ms");
+
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        return webDriver;
     }
 }

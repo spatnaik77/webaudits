@@ -4,6 +4,7 @@ import com.acc.webaudits.model.Crawler;
 import com.acc.webaudits.model.CrawlerInfo;
 import com.acc.webaudits.model.Note;
 import com.acc.webaudits.model.Scanner;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,18 +20,19 @@ public class WebauditsApplicationTests {
 	@Autowired
 	ApiManager apiManager;
 
-	@Test
-	public void contextLoads() {
+	String crawlerName = "bmw-india";
 
-		System.out.println("contextLoads");
+	@Before
+	public void setup() {
+
+		System.out.println("setup");
 		apiManager.cleanDB();
 	}
 
 	@Test
-	public void someScenario()
+	public void createCrawlerTest() throws Exception
 	{
 		//Create the crawler
-		String crawlerName = "bmw-india";
 		Crawler  c = new Crawler();
 		c.setName(crawlerName);
 		c.setUrl("https://www.bmw.de/de/footer/sitemap.html");
@@ -40,14 +42,11 @@ public class WebauditsApplicationTests {
 
         CrawlerInfo crawlerinfo =  apiManager.getCrawlerInfo(crawlerName);
 
-        System.out.println();
-		//Now create the scanner
-		/*Scanner s = new Scanner();
+		Scanner s = new Scanner();
 		s.setName("scan-1");
 		s.setDtmUrl("some-dtm-url");
 		s.setCrawlerName(crawlerName);
-		apiManager.createScanner(s);*/
-
+		apiManager.createScanner(s);
 	}
 
 
