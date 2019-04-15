@@ -58,9 +58,9 @@ public class WebauditsApplicationTests {
 
 		List<ScannerDetail> scannerDetailList = apiManager.getScannerDetails(scannerName);
 
-		apiManager.deleteCrawler(crawlerName);
+		//apiManager.deleteCrawler(crawlerName);
 
-		apiManager.deleteScanner(scannerName);
+		//apiManager.deleteScanner(scannerName);
 
 		System.out.println("Done...");
 	}

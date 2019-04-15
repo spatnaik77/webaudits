@@ -19,6 +19,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -55,7 +56,7 @@ public class ApiManager {
         crawlerRepository.deleteAll();
     }
     @Transactional
-    public void createCrawler(Crawler crawler)
+    public Crawler createCrawler(Crawler crawler)
     {
         crawler.setStatus("in-progress");
         crawlerRepository.save(crawler);
@@ -84,18 +85,30 @@ public class ApiManager {
         //close the web driver
         webDriver.close();
         webDriver.quit();
+
+        return crawler;
     }
+
     @Transactional
     public List<Crawler> getAllCrawlers()
     {
         return crawlerRepository.findAll();
+    }
 
+    @Transactional
+    public Crawler getCrawlerByName(String name)
+    {
+        Optional<Crawler> crawler = crawlerRepository.findById(name);
+        if(crawler != null)
+        {
+            return crawler.get();
+        }
+        return null;
     }
 
     @Transactional
     public List<CrawlerDetail> getCrawlerDetails(String crawlerName)
     {
-        Crawler crawler = crawlerRepository.getOne(crawlerName);
         List<CrawlerDetail> crawlerDetailList = crawlerDetailRepository.findByCrawlerName(crawlerName);
         return crawlerDetailList;
     }
@@ -189,7 +202,17 @@ public class ApiManager {
     public List<Scanner> getAllScanners()
     {
         return scannerRepository.findAll();
+    }
 
+    @Transactional
+    public Scanner getScannerByName(String name)
+    {
+        Optional<Scanner> scanner = scannerRepository.findById(name);
+        if(scanner != null)
+        {
+            return scanner.get();
+        }
+        return null;
     }
 
     @Transactional

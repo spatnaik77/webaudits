@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "localhost:8080/api/notes",
+			"name": "localhost:9999/api/v1/crawler",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -19,25 +19,25 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n        \"title\": \"personal\",\n        \"content\": \"Study with serene\"\n \n}"
+					"raw": "{\n        \"name\": \"crawler-1\",\n        \"url\": \"https://www.bmw.de/de/footer/sitemap.html\"\n \n}"
 				},
 				"url": {
-					"raw": "localhost:8080/api/notes",
+					"raw": "localhost:9999/api/v1/crawler",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "9999",
 					"path": [
 						"api",
-						"notes"
+						"v1",
+						"crawler"
 					]
-				},
-				"description": "Create Note"
+				}
 			},
 			"response": []
 		},
 		{
-			"name": "localhost:8080/api/notes",
+			"name": "localhost:9999/api/v1/crawlers",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -46,22 +46,22 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "localhost:8080/api/notes",
+					"raw": "localhost:9999/api/v1/crawlers",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "9999",
 					"path": [
 						"api",
-						"notes"
+						"v1",
+						"crawlers"
 					]
-				},
-				"description": "Get All Notes"
+				}
 			},
 			"response": []
 		},
 		{
-			"name": "localhost:8080/api/notes/1",
+			"name": "localhost:9999/api/v1/crawlers/crawler-1",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -70,18 +70,69 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "localhost:8080/api/notes/1",
+					"raw": "localhost:9999/api/v1/crawlers/crawler-1",
 					"host": [
 						"localhost"
 					],
-					"port": "8080",
+					"port": "9999",
 					"path": [
 						"api",
-						"notes",
-						"1"
+						"v1",
+						"crawlers",
+						"crawler-1"
 					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:9999/api/v1/crawlers/crawler-1",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
-				"description": "Get note by id"
+				"url": {
+					"raw": "localhost:9999/api/v1/crawlers/crawler-1",
+					"host": [
+						"localhost"
+					],
+					"port": "9999",
+					"path": [
+						"api",
+						"v1",
+						"crawlers",
+						"crawler-1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:9999/api/v1/crawlers/crawler-1/details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:9999/api/v1/crawlers/crawler-1/details",
+					"host": [
+						"localhost"
+					],
+					"port": "9999",
+					"path": [
+						"api",
+						"v1",
+						"crawlers",
+						"crawler-1",
+						"details"
+					]
+				}
 			},
 			"response": []
 		}
