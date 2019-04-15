@@ -1,9 +1,9 @@
 package com.acc.webaudits;
 
 import com.acc.webaudits.model.Crawler;
-import com.acc.webaudits.model.CrawlerInfo;
-import com.acc.webaudits.model.Note;
+import com.acc.webaudits.model.CrawlerDetail;
 import com.acc.webaudits.model.Scanner;
+import com.acc.webaudits.model.ScannerDetail;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,9 +42,9 @@ public class WebauditsApplicationTests {
 		c.setUrl(crawl_url);
 		apiManager.createCrawler(c);
 
-		List<Crawler> crawlers = apiManager.getAllCrawlers();
+		List<Crawler> crawlerList = apiManager.getAllCrawlers();
 
-        CrawlerInfo crawlerinfo =  apiManager.getCrawlerInfo(crawlerName);
+        List<CrawlerDetail> crawlerDetailList =  apiManager.getCrawlerDetails(crawlerName);
 
 		Scanner s = new Scanner();
 		String scannerName = scannerBaseName + System.nanoTime();
@@ -54,9 +54,17 @@ public class WebauditsApplicationTests {
 		s.setUrlList(urls);
 		apiManager.createScanner(s);
 
+		List<Scanner> scannerList = apiManager.getAllScanners();
+
+		List<ScannerDetail> scannerDetailList = apiManager.getScannerDetails(scannerName);
+
+		apiManager.deleteCrawler(crawlerName);
+
+		apiManager.deleteScanner(scannerName);
+
 		System.out.println("Done...");
 	}
-	@Test
+	/*@Test
 	public void Test2() throws Exception
 	{
 		//Create the crawler
@@ -66,9 +74,9 @@ public class WebauditsApplicationTests {
 		c.setUrl(crawl_url);
 		apiManager.createCrawler(c);
 
-		List<Crawler> crawlers = apiManager.getAllCrawlers();
+		List<Crawler> crawlerList = apiManager.getAllCrawlers();
 
-		CrawlerInfo crawlerinfo =  apiManager.getCrawlerInfo(crawlerName);
+		List<CrawlerDetail> crawlerDetailList =  apiManager.getCrawlerDetails(crawlerName);
 
 		Scanner s = new Scanner();
 		String scannerName = scannerBaseName + System.nanoTime();
@@ -77,8 +85,18 @@ public class WebauditsApplicationTests {
 		s.setCrawlerName(crawlerName);
 		apiManager.createScanner(s);
 
+		List<Scanner> scannerList = apiManager.getAllScanners();
+
+		List<ScannerDetail> scannerDetailList = apiManager.getScannerDetails(scannerName);
+
+		apiManager.deleteCrawler(crawlerName);
+
+		apiManager.deleteScanner(scannerName);
+
 		System.out.println("Done...");
-	}
+
+		System.out.println("Done...");
+	}*/
 
 
 

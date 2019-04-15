@@ -89,24 +89,26 @@ public class ApiManager {
     public List<Crawler> getAllCrawlers()
     {
         return crawlerRepository.findAll();
+
     }
 
     @Transactional
-    public CrawlerInfo getCrawlerInfo(String crawlerName)
+    public List<CrawlerDetail> getCrawlerDetails(String crawlerName)
     {
         Crawler crawler = crawlerRepository.getOne(crawlerName);
         List<CrawlerDetail> crawlerDetailList = crawlerDetailRepository.findByCrawlerName(crawlerName);
+        return crawlerDetailList;
+    }
 
-        CrawlerInfo crawlerInfo = new CrawlerInfo();
-        crawlerInfo.setName(crawler.getName());
-        crawlerInfo.setStatus(crawler.getStatus());
-        crawlerInfo.setUrl(crawler.getUrl());
-        crawlerInfo.setCrawledURLCount(crawler.getCrawledURLCount());
-        for(CrawlerDetail crawlerDetail : crawlerDetailList)
-        {
-            crawlerInfo.addCrawleredURL(crawlerDetail.getCrawled_url());
-        }
-        return crawlerInfo;
+    @Transactional
+    public void deleteCrawler(String crawlerName)
+    {
+        //Delete crawler details
+        List<CrawlerDetail> crawlerDetailList = crawlerDetailRepository.findByCrawlerName(crawlerName);
+        crawlerDetailRepository.deleteInBatch(crawlerDetailList);
+
+        //Delete crawler
+        crawlerRepository.deleteById(crawlerName);
 
     }
     //TODO Make it Async
@@ -114,7 +116,7 @@ public class ApiManager {
     {
         long startTime = System.currentTimeMillis();
         saveScannerState(scanner);
-        System.out.println(scanner.getName() + " created with status complete");
+        System.out.println(scanner.getName() + " created with status in-progress");
 
         String crawlerName = scanner.getCrawlerName();
         List<String> urlList = null;
@@ -170,6 +172,7 @@ public class ApiManager {
         scanner.setStatus("in-progress");
         scannerRepository.save(scanner);
     }
+
     @Transactional
     private void saveScannerState(String scannerName, String status, int totalCount, int successCount, int failureCount, long timeTaken)
     {
@@ -180,5 +183,31 @@ public class ApiManager {
         s.setTimeTaken(timeTaken);
         s.setStatus("complete");
         scannerRepository.save(s);
+    }
+
+    @Transactional
+    public List<Scanner> getAllScanners()
+    {
+        return scannerRepository.findAll();
+
+    }
+
+    @Transactional
+    public List<ScannerDetail> getScannerDetails(String scannerName)
+    {
+        List<ScannerDetail> scannerDetailList = scannerDetailRepository.findByScannerName(scannerName);
+        return scannerDetailList;
+    }
+
+    @Transactional
+    public void deleteScanner(String scannerName)
+    {
+        //Delete scanner details
+        List<ScannerDetail> scannerDetailList = scannerDetailRepository.findByScannerName(scannerName);
+        scannerDetailRepository.deleteInBatch(scannerDetailList);
+
+        //Delete scanner
+        scannerRepository.deleteById(scannerName);
+
     }
 }
