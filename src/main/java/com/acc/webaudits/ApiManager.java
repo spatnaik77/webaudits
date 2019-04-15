@@ -5,6 +5,8 @@ import com.acc.webaudits.repository.*;
 import com.acc.webaudits.scan.ScannerJob;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -56,13 +58,14 @@ public class ApiManager {
     {
         crawler.setStatus("in-progress");
         crawlerRepository.save(crawler);
+        System.out.println(crawler.getName() + " created with status in-progress");
 
         String url = crawler.getUrl();
         //Crawl and get the list of urls
         WebDriver webDriver = WebDriverManager.createWebDriver();
         webDriver.get(url);
         List<WebElement> webElements = webDriver.findElements(By.xpath(URL_XPATH));
-        System.out.println("total links" + webElements.size());
+        System.out.println("total links found : " + webElements.size());
         for(WebElement webElement : webElements)
         {
             CrawlerDetail crawlerDetail = new CrawlerDetail();
@@ -75,6 +78,7 @@ public class ApiManager {
         c.setCrawledURLCount(webElements.size());
         c.setStatus("complete");
         crawlerRepository.save(c);
+        System.out.println(crawler.getName() + " updated with status complete");
 
         //close the web driver
         webDriver.close();
@@ -105,12 +109,11 @@ public class ApiManager {
 
     }
     //TODO Make it Async
-    @Transactional
     public void createScanner(Scanner scanner) throws Exception
     {
         long startTime = System.currentTimeMillis();
-        scanner.setStatus("in-progress");
-        scannerRepository.save(scanner);
+        saveScannerState(scanner);
+        System.out.println(scanner.getName() + " created with status complete");
 
         String crawlerName = scanner.getCrawlerName();
         List<String> urlList = null;
@@ -126,9 +129,11 @@ public class ApiManager {
         else
         {
             String urlListAsString = scanner.getUrlList();
-            //Parse and get the url list. Not implemented
-
+            String[] tokens = urlListAsString.split(";");
+            urlList = Arrays.asList(tokens);
         }
+
+
         List<Future> results = new ArrayList<>();
         int batchSize = 100;
         for (int start = 0; start < urlList.size(); start += batchSize)
@@ -138,17 +143,28 @@ public class ApiManager {
             ScannerJob scannerJob = new ScannerJob(scanner.getName(), sublist, scannerDetailRepository);
             Future<Boolean> result = executor.submit(scannerJob);
             results.add(result);
-            System.out.println("Scanner created...");
+            System.out.println("ScannerJob created...");
         }
         for(Future f : results)
         {
             f.get();
         }
         long endTime = System.currentTimeMillis();
-        System.out.println("done... Time taken: " + (endTime-startTime)/60000 + " Ms");
+        System.out.println("done... Time taken: " + (endTime-startTime) + " Ms");
 
         //set the scanner status to complete
-        Scanner s = scannerRepository.findById(scanner.getName()).get();
+        saveScannerState(scanner.getName(), "complete");
+    }
+    @Transactional
+    private void saveScannerState(Scanner scanner)
+    {
+        scanner.setStatus("in-progress");
+        scannerRepository.save(scanner);
+    }
+    @Transactional
+    private void saveScannerState(String scannerName, String status)
+    {
+        Scanner s = scannerRepository.findById(scannerName).get();
         s.setStatus("complete");
         scannerRepository.save(s);
     }

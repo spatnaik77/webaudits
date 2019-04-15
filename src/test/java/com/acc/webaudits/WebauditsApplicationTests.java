@@ -20,7 +20,10 @@ public class WebauditsApplicationTests {
 	@Autowired
 	ApiManager apiManager;
 
-	String crawlerName = "bmw-india";
+	String crawl_url = "https://www.bmw.de/de/footer/sitemap.html";
+
+	String crawlerBaseName = "crawler-";
+	String scannerBaseName = "scan-";
 
 	@Before
 	public void setup() {
@@ -30,12 +33,13 @@ public class WebauditsApplicationTests {
 	}
 
 	@Test
-	public void createCrawlerTest() throws Exception
+	public void Test1() throws Exception
 	{
 		//Create the crawler
 		Crawler  c = new Crawler();
+		String crawlerName = crawlerBaseName + System.nanoTime();
 		c.setName(crawlerName);
-		c.setUrl("https://www.bmw.de/de/footer/sitemap.html");
+		c.setUrl(crawl_url);
 		apiManager.createCrawler(c);
 
 		List<Crawler> crawlers = apiManager.getAllCrawlers();
@@ -43,10 +47,37 @@ public class WebauditsApplicationTests {
         CrawlerInfo crawlerinfo =  apiManager.getCrawlerInfo(crawlerName);
 
 		Scanner s = new Scanner();
-		s.setName("scan-1");
+		String scannerName = scannerBaseName + System.nanoTime();
+		s.setName(scannerName);
+		s.setDtmUrl("some-dtm-url");
+		String urls = "https://www.bmw.de/de/footer/footer-section/cookie-policy.html;https://www.bmw.de/de/footer/footer-section/cookie-policy.html;https://www.bmw.de/de/footer/footer-section/cookie-policy.html;https://www.bmw.de/de/footer/footer-section/cookie-policy.html;https://www.bmw.de/de/footer/footer-section/cookie-policy.html";
+		s.setUrlList(urls);
+		apiManager.createScanner(s);
+
+		System.out.println("Done...");
+	}
+	@Test
+	public void Test2() throws Exception
+	{
+		//Create the crawler
+		Crawler  c = new Crawler();
+		String crawlerName = crawlerBaseName + System.nanoTime();
+		c.setName(crawlerName);
+		c.setUrl(crawl_url);
+		apiManager.createCrawler(c);
+
+		List<Crawler> crawlers = apiManager.getAllCrawlers();
+
+		CrawlerInfo crawlerinfo =  apiManager.getCrawlerInfo(crawlerName);
+
+		Scanner s = new Scanner();
+		String scannerName = scannerBaseName + System.nanoTime();
+		s.setName(scannerName);
 		s.setDtmUrl("some-dtm-url");
 		s.setCrawlerName(crawlerName);
 		apiManager.createScanner(s);
+
+		System.out.println("Done...");
 	}
 
 

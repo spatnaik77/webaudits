@@ -1,5 +1,6 @@
 package com.acc.webaudits.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -15,9 +16,9 @@ public class Scanner {
     //The input to scanner is either a crawler name or a list of URLs separated by semicolon
     // When the input is the crawler name, it gets the url list from the CrawlerDetail for the given crawler
 
-    @NotBlank
     private String crawlerName;
 
+    @Column(columnDefinition = "TEXT")
     private String urlList;
 
     private String dtmUrl;

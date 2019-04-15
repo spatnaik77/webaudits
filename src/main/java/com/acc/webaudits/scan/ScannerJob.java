@@ -52,6 +52,9 @@ public class ScannerJob implements Callable<Boolean>{
 	}
 	private void scanURls(List<String> lsturls )
 	{
+		int successCount = 0;
+		int failureCount = 0;
+		long startTime = System.currentTimeMillis();
 		try
 		{
 			for(int j=0;j<lsturls.size();j++)
@@ -59,6 +62,7 @@ public class ScannerJob implements Callable<Boolean>{
 				String urlval = lsturls.get(j);
 				if(urlval != null)
 				{
+					boolean result = false;
 					try
 					{
 						webDriver.navigate().to(urlval);
@@ -72,7 +76,8 @@ public class ScannerJob implements Callable<Boolean>{
 								scannerDetail.setResult("success");
 								scannerDetail.setUrl(urlval);
 								scannerDetailRepository.save(scannerDetail);
-								System.out.println(Thread.currentThread().getName() + "\t " +urlval + "\t " + "success");
+								//System.out.println(Thread.currentThread().getName() + "\t " +urlval + "\t " + "success");
+								result = true;
 								break;
 							}
 							else
@@ -82,9 +87,16 @@ public class ScannerJob implements Callable<Boolean>{
 								scannerDetail.setResult("failed");
 								scannerDetail.setUrl(urlval);
 								scannerDetailRepository.save(scannerDetail);
-								System.out.println(Thread.currentThread().getName() + "\t " +urlval + "\t " + "failure");
-								break;
+								//System.out.println(Thread.currentThread().getName() + "\t " +urlval + "\t " + "failure");
 							}
+						}
+						if(result)
+						{
+							successCount++;
+						}
+						else
+						{
+							failureCount++;
 						}
 					}
 					catch(Exception e)
@@ -96,8 +108,10 @@ public class ScannerJob implements Callable<Boolean>{
 				{
 					System.out.println(" url is null");
 				}
-			
 			}
+			long endTime = System.currentTimeMillis();
+			System.out.println("ScannerJob done. " + "successCount: " + successCount + " FailureCount: " + failureCount +
+					" Time taken: " + (endTime-startTime));
 		}
 		catch(Exception ex)
 		{
