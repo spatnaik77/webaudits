@@ -26,6 +26,14 @@ public class Scanner {
     @NotBlank
     private String status;
 
+    private int totalURLCount;
+
+    private int successCount;
+
+    private int failureCount;
+
+    private long timeTaken;
+
 
     public String getName() {
         return name;
@@ -65,5 +73,37 @@ public class Scanner {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public int getTotalURLCount() {
+        return totalURLCount;
+    }
+
+    public void setTotalURLCount(int totalURLCount) {
+        this.totalURLCount = totalURLCount;
+    }
+
+    public int getSuccessCount() {
+        return successCount;
+    }
+
+    public void setSuccessCount(int successCount) {
+        this.successCount = successCount;
+    }
+
+    public int getFailureCount() {
+        return failureCount;
+    }
+
+    public void setFailureCount(int failureCount) {
+        this.failureCount = failureCount;
+    }
+
+    public long getTimeTaken() {
+        return timeTaken;
+    }
+
+    public void setTimeTaken(long timeTaken) {
+        this.timeTaken = timeTaken;
     }
 }

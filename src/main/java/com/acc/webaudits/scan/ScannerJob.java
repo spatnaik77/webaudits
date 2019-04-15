@@ -15,7 +15,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ScannerJob implements Callable<Boolean>{
+public class ScannerJob implements Callable<ScannerJobResult>{
 
 
 
@@ -35,10 +35,11 @@ public class ScannerJob implements Callable<Boolean>{
 
 	}
 	@Override
-	public Boolean call() throws Exception 	{
+	public ScannerJobResult call() throws Exception 	{
+		ScannerJobResult scannerJobResult = null;
 		try 
 		{
-			this.scanURls(urlList);
+			scannerJobResult = this.scanURls(urlList);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -48,12 +49,13 @@ public class ScannerJob implements Callable<Boolean>{
 			webDriver.close();
 			webDriver.quit();
 		}
-		return true;
+		return scannerJobResult;
 	}
-	private void scanURls(List<String> lsturls )
+	private ScannerJobResult scanURls(List<String> lsturls )
 	{
 		int successCount = 0;
 		int failureCount = 0;
+		ScannerJobResult scannerJobResult = new ScannerJobResult();
 		long startTime = System.currentTimeMillis();
 		try
 		{
@@ -106,16 +108,19 @@ public class ScannerJob implements Callable<Boolean>{
 				}
 				else
 				{
-					System.out.println(" url is null");
+					failureCount++;
 				}
 			}
 			long endTime = System.currentTimeMillis();
 			System.out.println("ScannerJob done. " + "successCount: " + successCount + " FailureCount: " + failureCount +
 					" Time taken: " + (endTime-startTime));
+			scannerJobResult.setSuccessCount(successCount);
+			scannerJobResult.setFailureCount(failureCount);
 		}
 		catch(Exception ex)
 		{
 			ex.printStackTrace();
 		}
+		return scannerJobResult;
 	}
 }

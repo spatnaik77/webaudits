@@ -3,6 +3,7 @@ package com.acc.webaudits;
 import com.acc.webaudits.model.*;
 import com.acc.webaudits.repository.*;
 import com.acc.webaudits.scan.ScannerJob;
+import com.acc.webaudits.scan.ScannerJobResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -134,26 +135,34 @@ public class ApiManager {
         }
 
 
-        List<Future> results = new ArrayList<>();
+        List<Future<ScannerJobResult>> results = new ArrayList<Future<ScannerJobResult>>();
         int batchSize = 100;
         for (int start = 0; start < urlList.size(); start += batchSize)
         {
             int end = Math.min(start + batchSize, urlList.size());
             List<String> sublist = urlList.subList(start, end);
             ScannerJob scannerJob = new ScannerJob(scanner.getName(), sublist, scannerDetailRepository);
-            Future<Boolean> result = executor.submit(scannerJob);
-            results.add(result);
+            Future<ScannerJobResult> scannerJobResultFuture = executor.submit(scannerJob);
+            results.add(scannerJobResultFuture);
             System.out.println("ScannerJob created...");
         }
-        for(Future f : results)
+        int totalURLCount = urlList.size();
+        int totalSuccessCount = 0;
+        int totalFailureCount = 0;
+        for(Future<ScannerJobResult> f : results)
         {
-            f.get();
+            ScannerJobResult scannerJobResult = f.get();
+            totalSuccessCount = totalSuccessCount + scannerJobResult.getSuccessCount();
+            totalFailureCount = totalFailureCount + scannerJobResult.getFailureCount();
         }
         long endTime = System.currentTimeMillis();
-        System.out.println("done... Time taken: " + (endTime-startTime) + " Ms");
-
+        long timeTaken = (endTime-startTime);
+        System.out.println("-----------DONE-----------------");
+        System.out.println("totalURLCount : " + totalURLCount + " ,totalSuccessCount : " + totalSuccessCount +
+                " ,totalFailureCount : " + totalFailureCount + "  ,Time taken : " + timeTaken + " Ms");
+        System.out.println("-----------DONE-----------------");
         //set the scanner status to complete
-        saveScannerState(scanner.getName(), "complete");
+        saveScannerState(scanner.getName(), "complete", totalURLCount, totalSuccessCount, totalFailureCount, timeTaken);
     }
     @Transactional
     private void saveScannerState(Scanner scanner)
@@ -162,9 +171,13 @@ public class ApiManager {
         scannerRepository.save(scanner);
     }
     @Transactional
-    private void saveScannerState(String scannerName, String status)
+    private void saveScannerState(String scannerName, String status, int totalCount, int successCount, int failureCount, long timeTaken)
     {
         Scanner s = scannerRepository.findById(scannerName).get();
+        s.setTotalURLCount(totalCount);
+        s.setSuccessCount(successCount);
+        s.setFailureCount(failureCount);
+        s.setTimeTaken(timeTaken);
         s.setStatus("complete");
         scannerRepository.save(s);
     }
