@@ -1,6 +1,6 @@
 package com.acc.webaudits.scan;
 
-public class ScannerJobResult {
+public class ScannerBatchJobResult {
 
     private int successCount;
     private int failureCount;

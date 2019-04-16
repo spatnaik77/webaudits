@@ -2,8 +2,11 @@ package com.acc.webaudits;
 
 import com.acc.webaudits.model.*;
 import com.acc.webaudits.repository.*;
+import com.acc.webaudits.scan.CrawlerJob;
+import com.acc.webaudits.scan.ScannerBatchJob;
+import com.acc.webaudits.scan.ScannerBatchJobResult;
 import com.acc.webaudits.scan.ScannerJob;
-import com.acc.webaudits.scan.ScannerJobResult;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -13,9 +16,6 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -39,6 +39,9 @@ public class ApiManager {
     @Autowired
     ScannerDetailRepository scannerDetailRepository;
 
+    //@Autowired
+    //private SessionFactory sessionFactory;
+
     ExecutorService executor;
 
     private final String URL_XPATH = "//a[contains(@class,'ds2-icon--arrow-big-r-grey-2')]";
@@ -54,9 +57,22 @@ public class ApiManager {
         scannerRepository.deleteAll();
         crawlerDetailRepository.deleteAll();
         crawlerRepository.deleteAll();
+        //sessionFactory.getCurrentSession().getTransaction().
     }
     @Transactional
     public Crawler createCrawler(Crawler crawler)
+    {
+        crawler.setStatus("in-progress");
+        crawlerRepository.save(crawler);
+        System.out.println(crawler.getName() + " created with status in-progress");
+
+        CrawlerJob crawlerJob = new CrawlerJob(crawler, URL_XPATH, crawlerRepository, crawlerDetailRepository);
+        executor.submit(crawlerJob);
+
+        return crawler;
+    }
+    @Transactional
+    public Crawler createCrawlerSync(Crawler crawler)
     {
         crawler.setStatus("in-progress");
         crawlerRepository.save(crawler);
@@ -93,6 +109,7 @@ public class ApiManager {
     public List<Crawler> getAllCrawlers()
     {
         return crawlerRepository.findAll();
+
     }
 
     @Transactional
@@ -125,7 +142,7 @@ public class ApiManager {
 
     }
     //TODO Make it Async
-    public void createScanner(Scanner scanner) throws Exception
+    public void createScannerSync(Scanner scanner) throws Exception
     {
         long startTime = System.currentTimeMillis();
         saveScannerState(scanner);
@@ -150,25 +167,25 @@ public class ApiManager {
         }
 
 
-        List<Future<ScannerJobResult>> results = new ArrayList<Future<ScannerJobResult>>();
+        List<Future<ScannerBatchJobResult>> results = new ArrayList<Future<ScannerBatchJobResult>>();
         int batchSize = 100;
         for (int start = 0; start < urlList.size(); start += batchSize)
         {
             int end = Math.min(start + batchSize, urlList.size());
             List<String> sublist = urlList.subList(start, end);
-            ScannerJob scannerJob = new ScannerJob(scanner.getName(), sublist, scannerDetailRepository);
-            Future<ScannerJobResult> scannerJobResultFuture = executor.submit(scannerJob);
+            ScannerBatchJob scannerBatchJob = new ScannerBatchJob(scanner.getName(), sublist, scannerDetailRepository);
+            Future<ScannerBatchJobResult> scannerJobResultFuture = executor.submit(scannerBatchJob);
             results.add(scannerJobResultFuture);
-            System.out.println("ScannerJob created...");
+            System.out.println("ScannerBatchJob created...");
         }
         int totalURLCount = urlList.size();
         int totalSuccessCount = 0;
         int totalFailureCount = 0;
-        for(Future<ScannerJobResult> f : results)
+        for(Future<ScannerBatchJobResult> f : results)
         {
-            ScannerJobResult scannerJobResult = f.get();
-            totalSuccessCount = totalSuccessCount + scannerJobResult.getSuccessCount();
-            totalFailureCount = totalFailureCount + scannerJobResult.getFailureCount();
+            ScannerBatchJobResult scannerBatchJobResult = f.get();
+            totalSuccessCount = totalSuccessCount + scannerBatchJobResult.getSuccessCount();
+            totalFailureCount = totalFailureCount + scannerBatchJobResult.getFailureCount();
         }
         long endTime = System.currentTimeMillis();
         long timeTaken = (endTime-startTime);
@@ -179,6 +196,17 @@ public class ApiManager {
         //set the scanner status to complete
         saveScannerState(scanner.getName(), "complete", totalURLCount, totalSuccessCount, totalFailureCount, timeTaken);
     }
+    @Transactional
+    public Scanner createScanner(Scanner scanner) throws Exception
+    {
+        saveScannerState(scanner);
+        System.out.println(scanner.getName() + " created with status in-progress");
+
+        ScannerJob scannerJob = new ScannerJob(scanner, scannerRepository, scannerDetailRepository, crawlerDetailRepository, executor);
+        executor.submit(scannerJob);
+        return scanner;
+    }
+
     @Transactional
     private void saveScannerState(Scanner scanner)
     {

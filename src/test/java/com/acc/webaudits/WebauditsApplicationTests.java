@@ -40,7 +40,7 @@ public class WebauditsApplicationTests {
 		String crawlerName = crawlerBaseName + System.nanoTime();
 		c.setName(crawlerName);
 		c.setUrl(crawl_url);
-		apiManager.createCrawler(c);
+		apiManager.createCrawlerSync(c);
 
 		List<Crawler> crawlerList = apiManager.getAllCrawlers();
 
@@ -63,6 +63,8 @@ public class WebauditsApplicationTests {
 		//apiManager.deleteScanner(scannerName);
 
 		System.out.println("Done...");
+
+		System.in.read();
 	}
 	/*@Test
 	public void Test2() throws Exception

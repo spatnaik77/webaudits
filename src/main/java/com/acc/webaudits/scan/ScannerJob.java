@@ -1,126 +1,97 @@
 package com.acc.webaudits.scan;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-
-import com.acc.webaudits.model.ScannerDetail;
+import com.acc.webaudits.model.CrawlerDetail;
+import com.acc.webaudits.model.Scanner;
+import com.acc.webaudits.repository.CrawlerDetailRepository;
 import com.acc.webaudits.repository.ScannerDetailRepository;
-import com.acc.webaudits.repository.WebDriverManager;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.acc.webaudits.repository.ScannerRepository;
 
-public class ScannerJob implements Callable<ScannerJobResult>{
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+
+public class ScannerJob implements Runnable{
+
+    private Scanner scanner;
+    private CrawlerDetailRepository crawlerDetailRepository;
+    private ScannerDetailRepository scannerDetailRepository;
+    private ExecutorService executor;
+    private ScannerRepository scannerRepository;
 
 
+    public ScannerJob(Scanner scanner, ScannerRepository scannerRepository, ScannerDetailRepository scannerDetailRepository, CrawlerDetailRepository crawlerDetailRepository, ExecutorService executor)
+    {
+        this.scanner = scanner;
+        this.scannerRepository = scannerRepository;
+        this.scannerDetailRepository = scannerDetailRepository;
+        this.crawlerDetailRepository = crawlerDetailRepository;
+        this.executor = executor;
+    }
+    public void run()
+    {
+        long startTime = System.currentTimeMillis();
+        String crawlerName = scanner.getCrawlerName();
+        List<String> urlList = null;
+        if(crawlerName != null)
+        {
+            List<CrawlerDetail> crawlerDetailList = crawlerDetailRepository.findByCrawlerName(crawlerName);
+            urlList = new ArrayList<>();
+            for(CrawlerDetail crawlerDetail : crawlerDetailList)
+            {
+                urlList.add(crawlerDetail.getCrawled_url());
+            }
+        }
+        else
+        {
+            String urlListAsString = scanner.getUrlList();
+            String[] tokens = urlListAsString.split(";");
+            urlList = Arrays.asList(tokens);
+        }
 
-	WebDriver webDriver;
-	private List<String> urlList;
+        List<Future<ScannerBatchJobResult>> results = new ArrayList<Future<ScannerBatchJobResult>>();
+        int batchSize = 100;
+        for (int start = 0; start < urlList.size(); start += batchSize)
+        {
+            int end = Math.min(start + batchSize, urlList.size());
+            List<String> sublist = urlList.subList(start, end);
+            ScannerBatchJob scannerBatchJob = new ScannerBatchJob(scanner.getName(), sublist, scannerDetailRepository);
+            Future<ScannerBatchJobResult> scannerJobResultFuture = executor.submit(scannerBatchJob);
+            results.add(scannerJobResultFuture);
+            System.out.println("ScannerBatchJob created...");
+        }
+        int totalURLCount = urlList.size();
+        int totalSuccessCount = 0;
+        int totalFailureCount = 0;
+        for(Future<ScannerBatchJobResult> f : results)
+        {
+            ScannerBatchJobResult scannerBatchJobResult = null;
+            try
+            {
+                scannerBatchJobResult = f.get();
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            totalSuccessCount = totalSuccessCount + scannerBatchJobResult.getSuccessCount();
+            totalFailureCount = totalFailureCount + scannerBatchJobResult.getFailureCount();
+        }
+        long endTime = System.currentTimeMillis();
+        long timeTaken = (endTime-startTime);
+        System.out.println("-----------DONE-----------------");
+        System.out.println("totalURLCount : " + totalURLCount + " ,totalSuccessCount : " + totalSuccessCount +
+                " ,totalFailureCount : " + totalFailureCount + "  ,Time taken : " + timeTaken + " Ms");
+        System.out.println("-----------DONE-----------------");
 
-	private String scannerName;
-	private ScannerDetailRepository scannerDetailRepository;
-
-	public ScannerJob(String scannerName, List<String> lsturls, ScannerDetailRepository scannerDetailRepository)
-	{
-		this.scannerName = scannerName;
-		this.urlList = lsturls;
-		this.scannerDetailRepository = scannerDetailRepository;
-
-		this.webDriver = WebDriverManager.createWebDriver();
-
-	}
-	@Override
-	public ScannerJobResult call() throws Exception 	{
-		ScannerJobResult scannerJobResult = null;
-		try 
-		{
-			scannerJobResult = this.scanURls(urlList);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally
-		{
-			webDriver.close();
-			webDriver.quit();
-		}
-		return scannerJobResult;
-	}
-	private ScannerJobResult scanURls(List<String> lsturls )
-	{
-		int successCount = 0;
-		int failureCount = 0;
-		ScannerJobResult scannerJobResult = new ScannerJobResult();
-		long startTime = System.currentTimeMillis();
-		try
-		{
-			for(int j=0;j<lsturls.size();j++)
-			{
-				String urlval = lsturls.get(j);
-				if(urlval != null)
-				{
-					boolean result = false;
-					try
-					{
-						webDriver.navigate().to(urlval);
-						List<WebElement> liElement1 = webDriver.findElements(By.tagName("script"));
-						for (WebElement dtmscript : liElement1)
-						{
-							if(dtmscript.getAttribute("src").contains("assets.adobedtm.com"))
-							{
-								ScannerDetail scannerDetail = new ScannerDetail();
-								scannerDetail.setScannerName(scannerName);
-								scannerDetail.setResult("success");
-								scannerDetail.setUrl(urlval);
-								scannerDetailRepository.save(scannerDetail);
-								//System.out.println(Thread.currentThread().getName() + "\t " +urlval + "\t " + "success");
-								result = true;
-								break;
-							}
-							else
-							{
-								ScannerDetail scannerDetail = new ScannerDetail();
-								scannerDetail.setScannerName(scannerName);
-								scannerDetail.setResult("failed");
-								scannerDetail.setUrl(urlval);
-								scannerDetailRepository.save(scannerDetail);
-								//System.out.println(Thread.currentThread().getName() + "\t " +urlval + "\t " + "failure");
-							}
-						}
-						if(result)
-						{
-							successCount++;
-						}
-						else
-						{
-							failureCount++;
-						}
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-				else
-				{
-					failureCount++;
-				}
-			}
-			long endTime = System.currentTimeMillis();
-			System.out.println("ScannerJob done. " + "successCount: " + successCount + " FailureCount: " + failureCount +
-					" Time taken: " + (endTime-startTime));
-			scannerJobResult.setSuccessCount(successCount);
-			scannerJobResult.setFailureCount(failureCount);
-		}
-		catch(Exception ex)
-		{
-			ex.printStackTrace();
-		}
-		return scannerJobResult;
-	}
+        //set the scanner status to complete
+        //saveScannerState(scanner.getName(), "complete", totalURLCount, totalSuccessCount, totalFailureCount, timeTaken);
+        Scanner s = scannerRepository.findById(scanner.getName()).get();
+        s.setTotalURLCount(totalURLCount);
+        s.setSuccessCount(totalSuccessCount);
+        s.setFailureCount(totalFailureCount);
+        s.setTimeTaken(timeTaken);
+        s.setStatus("complete");
+        scannerRepository.save(s);
+    }
 }

@@ -24,7 +24,7 @@ public class WebAuditsController
     }
 
     @PostMapping("/crawler")
-    public Crawler createCrawler(@RequestBody Crawler crawler)
+    public Crawler createCrawlerSync(@RequestBody Crawler crawler)
     {
         return apiManager.createCrawler(crawler);
     }
@@ -52,10 +52,11 @@ public class WebAuditsController
     {
         apiManager.deleteCrawler(name);
     }
-    //fixme
-    public Scanner createScanner(Scanner scanner) throws Exception
+
+    @PostMapping("/scanner")
+    public Scanner createScanner(@RequestBody Scanner scanner) throws Exception
     {
-        return null;
+        return apiManager.createScanner(scanner);
     }
 
     @GetMapping("/scanners")

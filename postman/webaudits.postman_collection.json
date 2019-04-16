@@ -86,6 +86,32 @@
 			"response": []
 		},
 		{
+			"name": "localhost:9999/api/v1/crawlers/crawler-1/details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:9999/api/v1/crawlers/crawler-1/details",
+					"host": [
+						"localhost"
+					],
+					"port": "9999",
+					"path": [
+						"api",
+						"v1",
+						"crawlers",
+						"crawler-1",
+						"details"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "localhost:9999/api/v1/crawlers/crawler-1",
 			"request": {
 				"method": "DELETE",
@@ -111,7 +137,38 @@
 			"response": []
 		},
 		{
-			"name": "localhost:9999/api/v1/crawlers/crawler-1/details",
+			"name": "localhost:9999/api/v1/scanner",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n        \"name\": \"scanner-1\",\n        \"dtmUrl\" : \"some-dtm-url\",\n        \"urlList\": \"https://www.bmw.de/de/footer/footer-section/cookie-policy.html;https://www.bmw.de/de/footer/footer-section/cookie-policy.html;https://www.bmw.de/de/footer/footer-section/cookie-policy.html;https://www.bmw.de/de/footer/footer-section/cookie-policy.html;https://www.bmw.de/de/footer/footer-section/cookie-policy.html\"\n \n}"
+				},
+				"url": {
+					"raw": "localhost:9999/api/v1/scanner",
+					"host": [
+						"localhost"
+					],
+					"port": "9999",
+					"path": [
+						"api",
+						"v1",
+						"scanner"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:9999/api/v1/scanners",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -120,7 +177,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "localhost:9999/api/v1/crawlers/crawler-1/details",
+					"raw": "localhost:9999/api/v1/scanners",
 					"host": [
 						"localhost"
 					],
@@ -128,9 +185,83 @@
 					"path": [
 						"api",
 						"v1",
-						"crawlers",
-						"crawler-1",
+						"scanners"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:9999/api/v1/scanners/scanner-1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:9999/api/v1/scanners/scanner-1",
+					"host": [
+						"localhost"
+					],
+					"port": "9999",
+					"path": [
+						"api",
+						"v1",
+						"scanners",
+						"scanner-1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:9999/api/v1/scanners/scanner-1/details",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:9999/api/v1/scanners/scanner-1/details",
+					"host": [
+						"localhost"
+					],
+					"port": "9999",
+					"path": [
+						"api",
+						"v1",
+						"scanners",
+						"scanner-1",
 						"details"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:9999/api/v1/scanners/scanner-1",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:9999/api/v1/scanners/scanner-1",
+					"host": [
+						"localhost"
+					],
+					"port": "9999",
+					"path": [
+						"api",
+						"v1",
+						"scanners",
+						"scanner-1"
 					]
 				}
 			},
